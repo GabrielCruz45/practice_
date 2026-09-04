@@ -1,0 +1,53 @@
+numpy data types!
+
+Boolean
+
+    bool_ (bool)
+
+Integer
+
+    int8, int16, int32, int64
+    uint8, uint16, uint32, uint64
+    int_, uint_ (platform default, usually int64 on 64-bit)
+
+Floating point
+
+    float16, float32, float64, float128 (platform-dependent)
+    float_, single/ double aliases (float32/float64)
+
+Complex
+
+    complex64, complex128, complex256 (platform-dependent)
+
+Fixed‑size bytes / strings
+
+    S (bytes string of length n)
+    a (alias for bytes)
+
+Unicode strings
+
+    U (Unicode string of length n)
+
+Object
+
+    object_ (generic Python objects)
+
+Datetime / Timedelta
+
+    datetime64[unit] (units: Y, M, W, D, h, m, s, ms, us, ns, ps, fs, as)
+    timedelta64[unit]
+
+Structured / record (compound)
+
+    dtype([('field1', type1), ('field2', type2, shape), ...])
+
+Void (raw bytes)
+
+    void, V (raw byte buffer of length n)
+
+Others / special
+
+    category (via pandas, not native NumPy)
+    np.dtype('O') shorthand for object
+    custom dtype from np.dtype or numpy.ctypeslib
+

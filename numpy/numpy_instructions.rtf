@@ -1,0 +1,150 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Roman;\f1\froman\fcharset0 Times-Bold;\f2\fmodern\fcharset0 Courier;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\fs24 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Yes, quite a bit actually. NumPy is the invisible layer underneath almost everything librosa does \'97 every audio array, every feature matrix, every STFT output is a NumPy array. You won't always call NumPy directly, but you need to understand its concepts to make sense of what librosa returns and to do anything non-trivial with the results.\
+Here's what comes up exercise by exercise:\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f1\b \cf0 Exercises 1\'962 (load, waveform)
+\f0\b0  \'97 light NumPy. You need array shape (
+\f2\fs26 array.shape
+\f0\fs24 ), 
+\f2\fs26 dtype
+\f0\fs24 , and the idea that the audio signal is just a 1D float array. 
+\f2\fs26 len(y)
+\f0\fs24  and 
+\f2\fs26 y.shape[0]
+\f0\fs24  are the same thing, and knowing why matters.\
+
+\f1\b Exercise 3\'964 (STFT, spectrogram)
+\f0\b0  \'97 this is where NumPy becomes essential. 
+\f2\fs26 np.abs()
+\f0\fs24  extracts magnitude from complex numbers. You need to understand what a 2D array's shape 
+\f2\fs26 (frequencies, frames)
+\f0\fs24  means and how to index it. The 
+\f2\fs26 n_fft
+\f0\fs24  and 
+\f2\fs26 hop_length
+\f0\fs24  parameters directly control the output shape, and understanding why requires knowing how array dimensions work.\
+
+\f1\b Exercise 5 (phase extraction)
+\f0\b0  \'97 the most NumPy-heavy exercise in the fundamentals tier. You need 
+\f2\fs26 np.angle()
+\f0\fs24  to extract phase, 
+\f2\fs26 np.exp()
+\f0\fs24  and the imaginary unit 
+\f2\fs26 1j
+\f0\fs24  to reconstruct the complex matrix, and 
+\f2\fs26 np.allclose()
+\f0\fs24  to verify the result. You also need to understand complex number arrays as a dtype (
+\f2\fs26 complex64
+\f0\fs24 ), not just as a math concept.\
+
+\f1\b Exercises 6 (ISTFT, filtering)
+\f0\b0  \'97 slicing. Zeroing out the top half of frequency bins means 
+\f2\fs26 S[:n_fft//2, :] = 0
+\f0\fs24 , which requires understanding row/column indexing and slice notation. This is pure NumPy array manipulation.\
+
+\f1\b Exercises 7\'969 (chroma, MFCCs, deltas)
+\f0\b0  \'97 you need 
+\f2\fs26 axis=
+\f0\fs24  parameter awareness. When you compute per-coefficient mean and standard deviation for normalization, you do 
+\f2\fs26 np.mean(mfcc, axis=1, keepdims=True)
+\f0\fs24  \'97 and getting 
+\f2\fs26 axis=
+\f0\fs24  wrong silently produces a wrong result with no error. 
+\f2\fs26 keepdims=True
+\f0\fs24  matters for broadcasting to work correctly. You also need basic broadcasting intuition: subtracting a 
+\f2\fs26 (13, 1)
+\f0\fs24  array from a 
+\f2\fs26 (13, T)
+\f0\fs24  array works because of broadcasting rules.\
+
+\f1\b Exercise 10 (manual vector comparison)
+\f0\b0  \'97 explicit NumPy math. 
+\f2\fs26 np.dot(a, b)
+\f0\fs24 , 
+\f2\fs26 np.linalg.norm(v)
+\f0\fs24 , and knowing how to slice a single column from a matrix with 
+\f2\fs26 [:, frame_index]
+\f0\fs24 . The cosine similarity formula requires you to combine all three correctly.\
+
+\f1\b Exercises 11\'9613 (similarity matrices)
+\f0\b0  \'97 you mainly need to interpret the matrix shapes and index into them. 
+\f2\fs26 np.argmax()
+\f0\fs24  and 
+\f2\fs26 np.argsort()
+\f0\fs24  become useful for finding the most similar frames. You also need to be comfortable with the fact that 
+\f2\fs26 cross_similarity()
+\f0\fs24  returns a 2D float array and that you can treat it like any other matrix.\
+
+\f1\b Exercise 14\'9615 (DTW, full pipeline)
+\f0\b0  \'97 
+\f2\fs26 np.flipud()
+\f0\fs24  comes up because DTW returns a cost matrix that needs to be flipped for standard visualization orientation. You need to be comfortable stacking arrays with 
+\f2\fs26 np.vstack()
+\f0\fs24  or 
+\f2\fs26 np.concatenate()
+\f0\fs24  for combining feature matrices, and 
+\f2\fs26 np.nan
+\f0\fs24  / 
+\f2\fs26 np.nanmean()
+\f0\fs24  for handling missing values when aligning tracks of different lengths.\
+The concepts worth studying, roughly in order of how much they'll unblock you:\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f2\fs26 \cf0 array.shape
+\f0\fs24  and 
+\f2\fs26 ndim
+\f0\fs24  \'97 understanding what 
+\f2\fs26 (1025, 216)
+\f0\fs24  means for an STFT output is prerequisite to everything else. 
+\f2\fs26 dtype
+\f0\fs24  \'97 knowing the difference between 
+\f2\fs26 float32
+\f0\fs24 , 
+\f2\fs26 float64
+\f0\fs24 , and 
+\f2\fs26 complex64
+\f0\fs24 . Array indexing and slicing \'97 rows, columns, ranges, the 
+\f2\fs26 [:, i]
+\f0\fs24  column-slice pattern. 
+\f2\fs26 axis=
+\f0\fs24  parameter \'97 which direction an operation collapses. Broadcasting \'97 why 
+\f2\fs26 (13, 200) - (13, 1)
+\f0\fs24  works without a loop. 
+\f2\fs26 np.abs()
+\f0\fs24 , 
+\f2\fs26 np.angle()
+\f0\fs24 , 
+\f2\fs26 np.exp()
+\f0\fs24  \'97 the complex number toolkit. 
+\f2\fs26 np.dot()
+\f0\fs24  and 
+\f2\fs26 np.linalg.norm()
+\f0\fs24  \'97 the linear algebra basics. 
+\f2\fs26 np.allclose()
+\f0\fs24  \'97 for verifying numerical equality (exact equality fails with floats). 
+\f2\fs26 np.mean()
+\f0\fs24 , 
+\f2\fs26 np.std()
+\f0\fs24  with 
+\f2\fs26 axis=
+\f0\fs24  and 
+\f2\fs26 keepdims=True
+\f0\fs24  \'97 the normalization toolkit.\
+You don't need to know 
+\f2\fs26 np.fft
+\f0\fs24 , matrix decomposition, or anything from 
+\f2\fs26 np.linalg
+\f0\fs24  beyond 
+\f2\fs26 norm
+\f0\fs24 . The librosa functions handle the heavy math internally. What you need is fluency with the array as a data structure \'97 shapes, indexing, and the handful of mathematical operations that come up repeatedly.\
+}
