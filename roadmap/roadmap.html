@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Session — 12–18 Month Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1D1B18;
+    --surface: #26231E;
+    --surface-raised: #322E26;
+    --amber: #E8963A;
+    --amber-dim: #6B4C24;
+    --teal: #5FADA0;
+    --ink: #EDE6D8;
+    --ink-muted: #948C7C;
+    --line: #3A362D;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 36px 20px 60px; }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--teal);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 38px;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle { color: var(--ink-muted); font-size: 15px; margin: 0 0 18px; }
+
+  .meter { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin-bottom: 8px; }
+  .meter-bar {
+    flex: 1;
+    background: var(--surface-raised);
+    border-radius: 1px 1px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .meter-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 0%;
+    background: var(--amber-dim);
+  }
+  .meter-bar.lit::after { height: 100%; background: var(--amber); transition: height 0.6s ease, background 0.6s ease; }
+
+  .meter-readout {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 26px;
+  }
+  #pct { color: var(--amber); font-weight: 600; font-size: 15px; }
+
+  .intro {
+    margin: 0 0 26px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid var(--line);
+  }
+  .intro p { margin: 0; font-size: 14.5px; line-height: 1.65; color: var(--ink); }
+  .intro p + p { margin-top: 10px; }
+
+  .phase {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 14px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .phase summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 16px;
+    user-select: none;
+  }
+  .phase summary::-webkit-details-marker { display: none; }
+  .phase summary:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; }
+  .phase-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    border-radius: 4px;
+    padding: 3px 6px;
+    flex-shrink: 0;
+  }
+  .phase-title-group { flex: 1; min-width: 0; }
+  .phase-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16.5px;
+    display: block;
+  }
+  .phase-months {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-muted);
+  }
+  .phase-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    flex-shrink: 0;
+  }
+  .chevron {
+    width: 8px; height: 8px;
+    border-right: 1.5px solid var(--ink-muted);
+    border-bottom: 1.5px solid var(--ink-muted);
+    transform: rotate(-45deg);
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+  .phase[open] .chevron { transform: rotate(45deg); }
+
+  .phase-body { padding: 4px 16px 18px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .phase-desc { color: var(--ink-muted); font-size: 13.5px; margin: 0 0 12px; }
+
+  .tasks { list-style: none; margin: 0; padding: 0; }
+  .check-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding: 9px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+  }
+  .check-btn:hover { background: var(--surface-raised); }
+  .check-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; }
+  .check-box {
+    width: 19px; height: 19px;
+    border: 1.5px solid var(--ink-muted);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    position: relative;
+  }
+  .check-btn[aria-pressed="true"] .check-box { background: var(--amber); border-color: var(--amber); }
+  .check-btn[aria-pressed="true"] .check-box::after {
+    content: '';
+    position: absolute;
+    left: 5.5px; top: 1.5px;
+    width: 5px; height: 9px;
+    border: solid var(--bg);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .task-text { font-size: 14.5px; line-height: 1.5; padding-top: 1px; }
+  .check-btn[aria-pressed="true"] .task-text { color: var(--ink-muted); text-decoration: line-through; text-decoration-color: var(--ink-muted); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+  a.chip { text-decoration: none; color: var(--teal); border-color: rgba(95,173,160,0.35); transition: border-color 0.2s, color 0.2s; }
+  a.chip:hover, a.chip:focus-visible { border-color: var(--teal); color: var(--ink); }
+
+  .encore {
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 18px;
+    margin: 10px 0 24px;
+  }
+  .encore-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--teal);
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .encore p { margin: 0; color: var(--ink-muted); font-size: 13.5px; line-height: 1.65; }
+
+  footer { text-align: center; padding: 10px 0 0; font-size: 12px; color: var(--ink-muted); }
+  footer button {
+    background: none; border: none; color: var(--ink-muted);
+    text-decoration: underline; cursor: pointer; font-size: 12px; font-family: inherit; padding: 6px;
+  }
+  footer button:hover { color: var(--amber); }
+  footer button:focus-visible { outline: 2px solid var(--teal); }
+
+  @media (max-width: 380px) {
+    h1 { font-size: 30px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">12–18 MONTH ROADMAP</div>
+  <h1>The Session</h1>
+  <p class="subtitle">Track → Process → Mix → Master — from the drum sorter to a job-ready portfolio.</p>
+
+  <div class="meter" id="meter"></div>
+  <div class="meter-readout"><span id="pct">0%</span> — <span id="count">0/0</span> logged</div>
+
+  <div class="intro">
+    <p>A remote seat at a small company is more realistic through a backend developer who's genuinely fluent in data pipelines and applied ML than through the job title "Data Scientist," which usually gates on a degree or years you don't have yet.</p>
+    <p>Good news: that's already the shape of the drum sorter, half-built. Four phases, tracked like a record. Checks save automatically as you go.</p>
+  </div>
+
+  <div class="phases">
+
+    <details class="phase" open>
+      <summary>
+        <span class="phase-num">01</span>
+        <span class="phase-title-group">
+          <span class="phase-name">Signal Chain</span>
+          <span class="phase-months">Months 1–3</span>
+        </span>
+        <span class="phase-count" data-phase-count>0/8</span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="phase-body">
+        <p class="phase-desc">Get a clean, explicit pipeline flowing: audio in, structured data out.</p>
+        <ul class="tasks">
+          <li><button class="check-btn" data-id="p1-1" aria-pressed="false"><span class="check-box"></span><span class="task-text">Finish remaining NumPy exercises — arrays, broadcasting, vectorization</span></button></li>
+          <li><button class="check-btn" data-id="p1-2" aria-pressed="false"><span class="check-box"></span><span class="task-text">Finish remaining Matplotlib exercises — waveforms, spectrograms, feature plots</span></button></li>
+          <li><button class="check-btn" data-id="p1-3" aria-pressed="false"><span class="check-box"></span><span class="task-text">Finish remaining Librosa exercises — MFCCs, spectral centroid, ZCR, onset/tempo detection</span></button></li>
+          <li><button class="check-btn" data-id="p1-4" aria-pressed="false"><span class="check-box"></span><span class="task-text">Kaggle "Pandas" micro-course — DataFrames, indexing, grouping, merging</span></button></li>
+          <li><button class="check-btn" data-id="p1-5" aria-pressed="false"><span class="check-box"></span><span class="task-text">Kaggle "Intro to SQL" micro-course — window functions, joins, aggregates</span></button></li>
+          <li><button class="check-btn" data-id="p1-6" aria-pressed="false"><span class="check-box"></span><span class="task-text">Refactor the drum sorter into explicit stages: ingest → extract → transform → load</span></button></li>
+          <li><button class="check-btn" data-id="p1-7" aria-pressed="false"><span class="check-box"></span><span class="task-text">Add a features table — one row per sample, one column per extracted feature</span></button></li>
+          <li><button class="check-btn" data-id="p1-8" aria-pressed="false"><span class="check-box"></span><span class="task-text">Start a running architecture README as you build</span></button></li>
+        </ul>
+        <div class="chips">
+          <span class="chip">NumPy · Matplotlib · Librosa (yours)</span>
+          <a class="chip" href="https://www.kaggle.com/learn/pandas" target="_blank" rel="noopener">Kaggle: Pandas ↗</a>
+          <a class="chip" href="https://www.kaggle.com/learn" target="_blank" rel="noopener">Kaggle: Intro to SQL ↗</a>
+        </div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary>
+        <span class="phase-num">02</span>
+        <span class="phase-title-group">
+          <span class="phase-name">Processing</span>
+          <span class="phase-months">Months 3–6</span>
+        </span>
+        <span class="phase-count" data-phase-count>0/8</span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="phase-body">
+        <p class="phase-desc">Turn extracted features into real intelligence, and open the 3D toolkit.</p>
+        <ul class="tasks">
+          <li><button class="check-btn" data-id="p2-1" aria-pressed="false"><span class="check-box"></span><span class="task-text">Kaggle "Intro to Machine Learning" micro-course</span></button></li>
+          <li><button class="check-btn" data-id="p2-2" aria-pressed="false"><span class="check-box"></span><span class="task-text">Kaggle "Intermediate Machine Learning" micro-course — missing values, encoding, data leakage</span></button></li>
+          <li><button class="check-btn" data-id="p2-3" aria-pressed="false"><span class="check-box"></span><span class="task-text">Kaggle "Feature Engineering" micro-course</span></button></li>
+          <li><button class="check-btn" data-id="p2-4" aria-pressed="false"><span class="check-box"></span><span class="task-text">scikit-learn — KMeans clustering on your extracted features</span></button></li>
+          <li><button class="check-btn" data-id="p2-5" aria-pressed="false"><span class="check-box"></span><span class="task-text">scikit-learn — a classifier (Random Forest / SVM) to auto-tag sample type</span></button></li>
+          <li><button class="check-btn" data-id="p2-6" aria-pressed="false"><span class="check-box"></span><span class="task-text">scikit-learn — PCA or t-SNE to collapse features into 3D coordinates</span></button></li>
+          <li><button class="check-btn" data-id="p2-7" aria-pressed="false"><span class="check-box"></span><span class="task-text">Start Three.js Journey — scenes, cameras, geometry, materials, animation</span></button></li>
+          <li><button class="check-btn" data-id="p2-8" aria-pressed="false"><span class="check-box"></span><span class="task-text">Sketch the 3D "sample map" concept before you build it</span></button></li>
+        </ul>
+        <div class="chips">
+          <a class="chip" href="https://www.kaggle.com/learn" target="_blank" rel="noopener">Kaggle: Intro/Intermediate ML ↗</a>
+          <a class="chip" href="https://www.kaggle.com/learn" target="_blank" rel="noopener">Kaggle: Feature Engineering ↗</a>
+          <a class="chip" href="https://scikit-learn.org/stable/" target="_blank" rel="noopener">scikit-learn docs ↗</a>
+          <a class="chip" href="https://threejs-journey.com/" target="_blank" rel="noopener">Three.js Journey ↗</a>
+        </div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary>
+        <span class="phase-num">03</span>
+        <span class="phase-title-group">
+          <span class="phase-name">Mix</span>
+          <span class="phase-months">Months 6–10</span>
+        </span>
+        <span class="phase-count" data-phase-count>0/6</span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="phase-body">
+        <p class="phase-desc">Make it deployable, make it visible — the project starts looking finished here.</p>
+        <ul class="tasks">
+          <li><button class="check-btn" data-id="p3-1" aria-pressed="false"><span class="check-box"></span><span class="task-text">Docker — containerize the FastAPI backend</span></button></li>
+          <li><button class="check-btn" data-id="p3-2" aria-pressed="false"><span class="check-box"></span><span class="task-text">Cloud fundamentals — AWS free tier (S3 + IAM), or a simpler PaaS for the actual deploy</span></button></li>
+          <li><button class="check-btn" data-id="p3-3" aria-pressed="false"><span class="check-box"></span><span class="task-text">Continue Three.js Journey through its Blender module</span></button></li>
+          <li><button class="check-btn" data-id="p3-4" aria-pressed="false"><span class="check-box"></span><span class="task-text">Blender — model or source 2–3 assets for the sample map, export as glTF</span></button></li>
+          <li><button class="check-btn" data-id="p3-5" aria-pressed="false"><span class="check-box"></span><span class="task-text">Build the 3D sample map for real — coordinates in, interactive nodes, click-to-preview</span></button></li>
+          <li><button class="check-btn" data-id="p3-6" aria-pressed="false"><span class="check-box"></span><span class="task-text">Deploy the full stack to a live URL</span></button></li>
+        </ul>
+        <div class="chips">
+          <a class="chip" href="https://docs.docker.com/get-started/" target="_blank" rel="noopener">Docker docs ↗</a>
+          <a class="chip" href="https://aws.amazon.com/free/" target="_blank" rel="noopener">AWS Free Tier ↗</a>
+          <a class="chip" href="https://threejs-journey.com/" target="_blank" rel="noopener">Three.js Journey (Blender) ↗</a>
+        </div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary>
+        <span class="phase-num">04</span>
+        <span class="phase-title-group">
+          <span class="phase-name">Master</span>
+          <span class="phase-months">Months 10–13</span>
+        </span>
+        <span class="phase-count" data-phase-count>0/5</span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="phase-body">
+        <p class="phase-desc">The polish pass — what makes it read as production-quality, not a tutorial.</p>
+        <ul class="tasks">
+          <li><button class="check-btn" data-id="p4-1" aria-pressed="false"><span class="check-box"></span><span class="task-text">Write a real case-study README — problem, architecture, ML approach, demo GIF</span></button></li>
+          <li><button class="check-btn" data-id="p4-2" aria-pressed="false"><span class="check-box"></span><span class="task-text">Add pytest coverage — pipeline correctness, API endpoints</span></button></li>
+          <li><button class="check-btn" data-id="p4-3" aria-pressed="false"><span class="check-box"></span><span class="task-text">UI/UX polish pass on the 3D frontend</span></button></li>
+          <li><button class="check-btn" data-id="p4-4" aria-pressed="false"><span class="check-box"></span><span class="task-text">Optional: rebuild the frontend in React Three Fiber</span></button></li>
+          <li><button class="check-btn" data-id="p4-5" aria-pressed="false"><span class="check-box"></span><span class="task-text">Pick one stretch goal — a second data pipeline project, or a PyTorch classifier</span></button></li>
+        </ul>
+        <div class="chips">
+          <a class="chip" href="https://docs.pytest.org/" target="_blank" rel="noopener">pytest docs ↗</a>
+          <a class="chip" href="https://docs.pmnd.rs/react-three-fiber/getting-started/introduction" target="_blank" rel="noopener">React Three Fiber ↗</a>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <div class="encore">
+    <div class="encore-label">ENCORE — MONTHS 13–18</div>
+    <p>Room to run long on Master, chase whichever stretch goal you picked, or keep deepening SQL and cloud. This is also the natural point to bring interview prep and DSA practice into the plan — we'll build that one separately when the portfolio's ready.</p>
+  </div>
+
+  <footer>
+    Progress saves automatically to this artifact. <button id="reset-btn" type="button">Reset progress</button>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'session-roadmap-progress-v1';
+  let state = {};
+
+  const meterEl = document.getElementById('meter');
+  const heights = [14,20,30,24,36,40,34,28,22,32,38,26,18,30,36,22,16,26,34,20,28,38,24,14,30,20];
+  heights.forEach(function (h) {
+    const bar = document.createElement('div');
+    bar.className = 'meter-bar';
+    bar.style.height = h + 'px';
+    meterEl.appendChild(bar);
+  });
+  const bars = document.querySelectorAll('.meter-bar');
+
+  function applyState() {
+    document.querySelectorAll('.check-btn').forEach(function (btn) {
+      const checked = !!state[btn.dataset.id];
+      btn.setAttribute('aria-pressed', checked ? 'true' : 'false');
+    });
+  }
+
+  function updateAllProgress() {
+    const allBtns = Array.from(document.querySelectorAll('.check-btn'));
+    const doneCount = allBtns.filter(function (b) { return state[b.dataset.id]; }).length;
+    const pct = allBtns.length ? Math.round((doneCount / allBtns.length) * 100) : 0;
+    document.getElementById('pct').textContent = pct + '%';
+    document.getElementById('count').textContent = doneCount + '/' + allBtns.length;
+
+    const litCount = Math.round((pct / 100) * bars.length);
+    bars.forEach(function (bar, i) { bar.classList.toggle('lit', i < litCount); });
+
+    document.querySelectorAll('.phase').forEach(function (phase) {
+      const btns = Array.from(phase.querySelectorAll('.check-btn'));
+      const done = btns.filter(function (b) { return state[b.dataset.id]; }).length;
+      const badge = phase.querySelector('[data-phase-count]');
+      if (badge) badge.textContent = done + '/' + btns.length;
+    });
+  }
+
+  async function persist() {
+    try {
+      await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+    } catch (e) {
+      console.error('Could not save progress', e);
+    }
+  }
+
+  document.querySelectorAll('.check-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const id = btn.dataset.id;
+      state[id] = !state[id];
+      btn.setAttribute('aria-pressed', state[id] ? 'true' : 'false');
+      updateAllProgress();
+      persist();
+    });
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', async function () {
+    if (confirm('Clear all checked progress? This cannot be undone.')) {
+      state = {};
+      applyState();
+      updateAllProgress();
+      try {
+        await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+      } catch (e) {
+        console.error('Could not reset progress', e);
+      }
+    }
+  });
+
+  async function init() {
+    try {
+      const res = await window.storage.get(STORAGE_KEY, false);
+      if (res && res.value) state = JSON.parse(res.value);
+    } catch (e) {
+      state = {};
+    }
+    applyState();
+    updateAllProgress();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

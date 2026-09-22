@@ -115,6 +115,8 @@ period_ecc_mask = (period_ecc_stack[:, 0] < 100) & (period_ecc_stack[:, 1] < 0.3
 print(period_ecc_mask.size, period_ecc_mask.sum())
 print(period_ecc_mask.shape)
 
+
+
 # 22 Build a mask for "Sun-like" host stars: t_eff between 5000 and 6000 K. Both bounds
 # are on the SAME column this time, not two different columns — combine them with &.
 # Stack `t_eff` and `st_rad` into a 2-column array called `t_eff_and_st_rad`, apply the
@@ -124,6 +126,10 @@ sun_like_mask = (t_eff > 5000 ) & (t_eff < 6000)
 t_eff_and_st_rad = np.stack((t_eff, st_rad))
 
 print(t_eff_and_st_rad.shape)
+
+print(f"type: {type(np.where(sun_like_mask, t_eff_and_st_rad, np.nan))}")
+
+
 
 sun_like_rows, sun_like_columns = t_eff_and_st_rad[np.where(sun_like_mask, t_eff_and_st_rad, np.nan)]
 # print(np.isnan(sun_like_result).any(axis=1).sum())

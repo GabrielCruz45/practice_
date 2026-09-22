@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<title>Recursion Practice Set</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14181F;
+  --paper:#F5F6F3;
+  --surface:#FFFFFF;
+  --line:#DEE1DB;
+  --muted:#6A6F66;
+  --depth:#0B6E76;
+  --on-depth:#FFFFFF;
+  --easy:#3E8F63;
+  --easy-bg:#E4F3EA;
+  --medium:#A66A1B;
+  --medium-bg:#F7EBDA;
+  --hard:#B0473B;
+  --hard-bg:#F8E5E2;
+  --radius:10px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#E7EAEA; --paper:#10141A; --surface:#171C24; --line:#262C34; --muted:#9AA09B;
+    --depth:#4FD6D1; --on-depth:#0E2E2C;
+    --easy:#6FCB92; --easy-bg:#173226;
+    --medium:#E5A94C; --medium-bg:#392D18;
+    --hard:#E97C71; --hard-bg:#3A211E;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#E7EAEA; --paper:#10141A; --surface:#171C24; --line:#262C34; --muted:#9AA09B;
+  --depth:#4FD6D1; --on-depth:#0E2E2C;
+  --easy:#6FCB92; --easy-bg:#173226;
+  --medium:#E5A94C; --medium-bg:#392D18;
+  --hard:#E97C71; --hard-bg:#3A211E;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth; scroll-padding-top:calc(60px + env(safe-area-inset-top,0px));}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{transition-duration:0.001ms !important; animation-duration:0.001ms !important;}
+}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+h1,h2,.tier-num,.toc-item .n,.btn,.mark,.ex-top .num{font-family:"Space Grotesk", ui-sans-serif, system-ui, sans-serif;}
+.wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+a{color:var(--depth)}
+:focus-visible{outline:2px solid var(--depth); outline-offset:2px;}
+
+.topbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:10; border-bottom:1px solid var(--line);
+  background:var(--paper); background:color-mix(in srgb, var(--paper) 90%, transparent);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);}
+.topbar-inner{max-width:760px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:14px;}
+.mark{font-weight:600; font-size:14px; white-space:nowrap;}
+.progress-wrap{flex:1; display:flex; align-items:center; gap:10px;}
+.progress-text{font-size:12px; color:var(--muted); white-space:nowrap; min-width:52px; text-align:right; font-variant-numeric:tabular-nums;}
+.bar{height:6px; border-radius:99px; background:var(--line); overflow:hidden;}
+.bar > span{display:block; height:100%; width:0%; background:var(--depth); border-radius:99px; transition:width .35s ease;}
+.progress-wrap .bar{flex:1;}
+.btn{border:1px solid var(--line); background:var(--surface); color:var(--ink); padding:6px 12px; border-radius:8px; font-size:13px; cursor:pointer;}
+.btn:hover{border-color:var(--depth)}
+
+.hero{padding:48px 0 36px;}
+.hero-grid{display:grid; grid-template-columns:1.15fr 0.85fr; gap:36px; align-items:start;}
+.hero h1{font-size:33px; line-height:1.2; font-weight:600; margin:0 0 16px; letter-spacing:-0.01em;}
+.hero p{margin:0 0 14px; color:var(--muted); font-size:15.5px; max-width:50ch;}
+.method{font-size:14px; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; margin-top:6px;}
+.method p{color:var(--ink); margin:0 0 8px; max-width:none;}
+.method p:last-child{margin-bottom:0}
+.diagram{width:100%; max-width:280px; height:auto; display:block; margin:6px auto 0;}
+.frame{fill:var(--surface); stroke:var(--line); stroke-width:1.4;}
+.frame-base{fill:var(--depth); stroke:var(--depth);}
+.frame-text{font-family:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace; font-size:13px; fill:var(--ink);}
+.frame-text-base{fill:var(--on-depth);}
+.frame-caption{font-family:ui-sans-serif,system-ui,sans-serif; font-size:11px; fill:var(--muted);}
+
+.toc{padding:8px 0 36px;}
+.toc-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+.toc-item{display:block; text-decoration:none; color:var(--ink); border:1px solid var(--line); border-radius:var(--radius); padding:14px 14px 12px; background:var(--surface);}
+.toc-item:hover{border-color:var(--depth);}
+.toc-item .n{font-size:20px; font-weight:600; color:var(--depth); line-height:1; margin-bottom:6px;}
+.toc-item .name{font-weight:600; font-size:13.5px; margin-bottom:12px; min-height:34px;}
+.toc-item .count{font-size:11px; color:var(--muted); margin-top:6px;}
+
+.tier{border-top:1px solid var(--line); padding:24px 0;}
+.tier:last-of-type{border-bottom:1px solid var(--line);}
+.tier > summary{list-style:none; cursor:pointer; display:flex; gap:16px; align-items:flex-start;}
+.tier > summary::-webkit-details-marker{display:none;}
+.tier-num{font-weight:600; font-size:26px; color:var(--depth); line-height:1.2; min-width:38px; flex:none;}
+.chev{width:16px; height:16px; margin-top:9px; flex:none; color:var(--muted); transition:transform .2s ease;}
+.tier[open] .chev{transform:rotate(90deg);}
+.tier-head{flex:1; min-width:0;}
+.tier-head h2{font-size:18.5px; font-weight:600; margin:0 0 4px;}
+.tier-head .sub{font-size:13.5px; color:var(--muted); margin:0 0 10px; max-width:62ch;}
+.tier-head .bar{max-width:220px; margin-bottom:5px;}
+.tier-head .count{font-size:12px; color:var(--muted);}
+.ex-list{margin-top:16px; padding-left:54px;}
+.ex{display:flex; gap:12px; padding:11px 0; border-top:1px solid var(--line); align-items:flex-start;}
+.ex:first-child{border-top:none; padding-top:4px;}
+.ex input[type=checkbox]{width:18px; height:18px; accent-color:var(--depth); margin-top:3px; flex:none; cursor:pointer;}
+.ex-body{flex:1; cursor:pointer; display:block; min-width:0;}
+.ex-top{display:flex; align-items:center; gap:9px; flex-wrap:wrap;}
+.ex-top .num{font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums;}
+.ex-top .title{font-weight:600; font-size:14.5px;}
+.ex.done .title{color:var(--muted); font-weight:500;}
+.ex.done .desc{opacity:.7;}
+.desc{font-size:13.5px; color:var(--muted); margin:4px 0 0; max-width:58ch;}
+.tag{font-size:11px; padding:3px 9px; border-radius:99px; white-space:nowrap;}
+.tag.Easy{color:var(--easy); background:var(--easy-bg);}
+.tag.Medium{color:var(--medium); background:var(--medium-bg);}
+.tag.Hard{color:var(--hard); background:var(--hard-bg);}
+.tag.recap{color:var(--depth); background:color-mix(in srgb, var(--depth) 16%, transparent);}
+
+footer{padding:28px 0 64px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:6px;}
+
+@media (max-width: 720px){
+  .hero-grid{grid-template-columns:1fr;}
+  .diagram{max-width:240px; margin-top:20px;}
+  .toc-grid{grid-template-columns:1fr 1fr;}
+  .ex-list{padding-left:0;}
+}
+@media (max-width: 460px){
+  .toc-grid{grid-template-columns:1fr;}
+  .hero h1{font-size:27px;}
+  .topbar .mark{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="mark">Recursion Practice</span>
+    <div class="progress-wrap">
+      <div class="bar"><span id="topBar"></span></div>
+      <span class="progress-text" id="topText">0 / 78</span>
+    </div>
+    <button class="btn" id="resetBtn" type="button">Reset</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <h1>Trust the smaller problem.</h1>
+        <p>78 recursion exercises, ordered from base cases to backtracking and memoized dynamic programming. Each tier trains one pattern you'll keep using across data structures and algorithms, then closes with a recap that tests the whole tier at once.</p>
+        <div class="method">
+          <p>Write the base case first. Then write the recursive case as if the call on a smaller input already works — that's the leap of faith recursion asks for.</p>
+          <p>Trace through a tiny example by hand once you have an answer, not while you're still guessing at one.</p>
+        </div>
+      </div>
+      <svg class="diagram" viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of a recursive call stack narrowing down to a base case, then building back up">
+        <rect class="frame" x="6" y="4" width="230" height="34" rx="8"/>
+        <text class="frame-text" x="24" y="26">f(n)</text>
+        <rect class="frame" x="26" y="46" width="198" height="34" rx="8"/>
+        <text class="frame-text" x="44" y="68">f(n-1)</text>
+        <rect class="frame" x="46" y="88" width="166" height="34" rx="8"/>
+        <text class="frame-text" x="64" y="110">f(n-2)</text>
+        <rect class="frame" x="66" y="130" width="134" height="24" rx="8" stroke-dasharray="2 4"/>
+        <text class="frame-text" x="84" y="146" style="font-size:12px">...</text>
+        <rect class="frame frame-base" x="86" y="162" width="110" height="34" rx="8"/>
+        <text class="frame-text frame-text-base" x="104" y="184">f(0)</text>
+        <text class="frame-caption" x="6" y="210">smallest input first — the answers build back up from there</text>
+      </svg>
+    </div>
+  </section>
+
+  <nav class="toc"><div class="toc-grid" id="tocGrid"></div></nav>
+
+  <main id="tiers"></main>
+
+  <footer>Checked exercises are saved in this browser only, so progress won't follow you to a different device.</footer>
+</div>
+
+<script>
+const TIERS = [
+ {id:1, name:"Fundamentals", sub:"Identify the base case and the recursive case. No loops allowed.", items:[
+   {t:"Factorial", d:"Compute n! recursively. What's the base case, and what should happen if n is 0?", diff:"Easy"},
+   {t:"Sum of 1 to N", d:"Sum the first n natural numbers without a single loop.", diff:"Easy"},
+   {t:"Naive power", d:"Compute x to the power n the obvious recursive way. What's its time complexity?", diff:"Easy"},
+   {t:"Countdown", d:"Print every integer from n down to 1, recursion only.", diff:"Easy"},
+   {t:"Count up", d:"Print every integer from 1 up to n, using the same shape of function as Countdown — just move one line.", diff:"Easy"},
+   {t:"Sum of digits", d:"Given an integer, recursively sum its digits (1234 becomes 1+2+3+4).", diff:"Easy"},
+   {t:"Reverse an integer", d:"Recursively reverse the digits of a number (1234 becomes 4321) without converting to a string.", diff:"Easy"},
+   {t:"Euclid's GCD", d:"Implement gcd(a, b) recursively using gcd(a, b) = gcd(b, a mod b).", diff:"Easy"},
+   {t:"Digital root", d:"Repeatedly sum a number's digits until one digit remains (9875 becomes 29, then 11, then 2). One recursive function driving another.", diff:"Medium", recap:true}
+ ]},
+ {id:2, name:"Linear recursion on arrays and strings", sub:"Recursion replaces a single loop — each call peels off one element and hands the rest downstream.", items:[
+   {t:"Array sum", d:"Recursively sum every element of an array.", diff:"Easy"},
+   {t:"Array max", d:"Recursively find the largest element in an array.", diff:"Easy"},
+   {t:"Is it sorted?", d:"Recursively check whether an array is sorted in ascending order.", diff:"Easy"},
+   {t:"Reverse a string", d:"Recursively reverse a string without slicing shortcuts.", diff:"Easy"},
+   {t:"Palindrome check", d:"Recursively check whether a string reads the same forwards and backwards.", diff:"Easy"},
+   {t:"Count vowels", d:"Recursively count the vowels in a string.", diff:"Easy"},
+   {t:"Remove a character", d:"Recursively return a new string with every occurrence of a given character removed.", diff:"Easy"},
+   {t:"Is subsequence", d:"Recursively check whether string A is a subsequence of string B — same order, not necessarily contiguous.", diff:"Medium"},
+   {t:"Recursive linear search", d:"Return the index of the first occurrence of a target in an array, or -1. Your baseline before Tier 4's binary search.", diff:"Easy"},
+   {t:"Longest palindrome in a list", d:"Given an array of strings, recursively find the longest one that is also a palindrome — combining the search pattern with the palindrome check.", diff:"Medium", recap:true}
+ ]},
+ {id:3, name:"Branching recursion", sub:"More than one recursive call per stack frame. Watch how fast the call tree grows.", items:[
+   {t:"Fibonacci, naive", d:"Compute the nth Fibonacci number with two recursive calls. Sketch the call tree for n=5 and count how many times fib(2) gets recomputed.", diff:"Easy"},
+   {t:"Tower of Hanoi", d:"Print the full sequence of moves to shift n disks from one peg to another.", diff:"Medium"},
+   {t:"Power set", d:"Recursively generate every subset of a set, deciding include-or-exclude at each element.", diff:"Medium"},
+   {t:"Climbing stairs", d:"Count the distinct ways to climb n stairs taking 1 or 2 steps at a time.", diff:"Medium"},
+   {t:"Subset sum exists", d:"Recursively determine whether any subset of an array sums to a target value.", diff:"Medium"},
+   {t:"n choose r, Pascal's rule", d:"Compute C(n, r) using C(n, r) = C(n-1, r-1) + C(n-1, r).", diff:"Medium"},
+   {t:"All binary strings of length n", d:"Recursively generate every string of 0s and 1s of length n.", diff:"Medium"},
+   {t:"Coin change, count the ways", d:"Given coin denominations and a target amount, recursively count how many distinct ways to make that amount. No memo yet — just the branching.", diff:"Medium", recap:true}
+ ]},
+ {id:4, name:"Divide and conquer", sub:"Split the problem, solve the pieces, combine the results. This is where recursion starts beating brute force asymptotically.", items:[
+   {t:"Binary search", d:"Recursively search a sorted array. Be ready to justify why it's O(log n).", diff:"Medium"},
+   {t:"Merge sort", d:"Implement it recursively, including the merge step. Justify the O(n log n).", diff:"Medium"},
+   {t:"Quick sort", d:"Implement it recursively with an in-place partition step.", diff:"Medium"},
+   {t:"Max and min in one pass", d:"Recursively find both the max and min of an array by splitting it in half, using fewer comparisons than checking each separately.", diff:"Medium"},
+   {t:"Fast exponentiation", d:"Compute x^n in O(log n) using x^n = (x^(n/2))^2. Compare it to Tier 1's naive version.", diff:"Medium"},
+   {t:"Count inversions", d:"Count pairs (i, j) where i < j but array[i] > array[j], using a modified merge sort.", diff:"Hard"},
+   {t:"Majority element", d:"Recursively find the element appearing more than n/2 times, using divide and conquer.", diff:"Hard"},
+   {t:"Quickselect", d:"Find the kth smallest element in an unsorted array by reusing quicksort's partition step, recursing into only the half that matters.", diff:"Hard", recap:true}
+ ]},
+ {id:5, name:"Recursion on linked lists", sub:"No index access. Recursion mirrors the pointer-chasing structure of the data itself.", items:[
+   {t:"Linked list length", d:"Recursively count the nodes in a singly linked list.", diff:"Easy"},
+   {t:"Linked list search", d:"Recursively search for a value in a singly linked list.", diff:"Easy"},
+   {t:"Reverse a linked list", d:"Recursively reverse a singly linked list in place — no new list.", diff:"Medium"},
+   {t:"Linked list palindrome", d:"Recursively check whether a singly linked list reads the same forwards and backwards.", diff:"Medium"},
+   {t:"Merge two sorted lists", d:"Recursively merge two sorted linked lists into one sorted list.", diff:"Medium"},
+   {t:"Remove a value", d:"Recursively remove every node containing a given value from a linked list.", diff:"Medium"},
+   {t:"Reorder list", d:"Turn 1-2-3-4-5 into 1-5-2-4-3. Find the middle, reverse the second half, then merge the two halves alternately.", diff:"Hard", recap:true}
+ ]},
+ {id:6, name:"Recursion on trees", sub:"Recursion is the natural shape of a tree — each node's problem reduces to the same problem on its children.", items:[
+   {t:"Preorder traversal", d:"Visit root, then left subtree, then right subtree, recursively.", diff:"Easy"},
+   {t:"Inorder traversal", d:"Visit left subtree, then root, then right subtree, recursively.", diff:"Easy"},
+   {t:"Postorder traversal", d:"Visit left subtree, then right subtree, then root, recursively.", diff:"Easy"},
+   {t:"Tree height", d:"Recursively compute the maximum depth of a binary tree.", diff:"Easy"},
+   {t:"Count nodes", d:"Recursively count the total number of nodes in a binary tree.", diff:"Easy"},
+   {t:"Identical trees", d:"Recursively check whether two binary trees are structurally identical with matching values.", diff:"Medium"},
+   {t:"Validate a BST", d:"Recursively check whether a binary tree is a valid binary search tree, passing min and max bounds down.", diff:"Medium"},
+   {t:"Lowest common ancestor", d:"Recursively find the LCA of two nodes in a binary search tree.", diff:"Medium"},
+   {t:"Invert a binary tree", d:"Recursively swap every left and right child.", diff:"Medium"},
+   {t:"Diameter of a binary tree", d:"Recursively find the longest path between any two nodes, not necessarily through the root. The trick is tracking height and diameter at the same time.", diff:"Hard"},
+   {t:"Balanced tree check", d:"Determine whether every node's left and right subtree heights differ by at most 1 — in a single traversal, not by recomputing height at every node.", diff:"Hard", recap:true}
+ ]},
+ {id:7, name:"Backtracking", sub:"Choose, explore, un-choose. Build a solution incrementally and abandon paths that fail.", items:[
+   {t:"All permutations", d:"Recursively generate every permutation of a list.", diff:"Medium"},
+   {t:"Combinations of k", d:"Recursively generate every combination of k elements chosen from n.", diff:"Medium"},
+   {t:"Valid parentheses", d:"Recursively generate every well-formed combination of n pairs of parentheses.", diff:"Medium"},
+   {t:"N-Queens", d:"Recursively find every way to place n queens on an n by n board so none attack each other.", diff:"Hard"},
+   {t:"Word search", d:"Depth-first, with backtracking: determine whether a word can be traced through adjacent cells in a 2D grid of letters.", diff:"Hard"},
+   {t:"Combination sum", d:"Recursively find every unique combination of numbers, reuse allowed, that sums to a target.", diff:"Medium"},
+   {t:"Subsets with duplicates", d:"Recursively generate all unique subsets from a list that may contain duplicate values.", diff:"Medium"},
+   {t:"Sudoku solver", d:"Recursively fill a 9 by 9 Sudoku board using backtracking with constraint checking.", diff:"Hard"},
+   {t:"Rat in a maze", d:"Recursively find every path from top-left to bottom-right of a grid, avoiding blocked cells.", diff:"Medium"},
+   {t:"Palindrome partitioning", d:"Split a string into every possible grouping where each piece is a palindrome — choose, explore, un-choose, with Tier 2's palindrome check along the way.", diff:"Hard", recap:true}
+ ]},
+ {id:8, name:"Recursion on graphs", sub:"Extend tree recursion to structures that can have cycles — now you need a visited set.", items:[
+   {t:"Recursive DFS", d:"Implement depth-first search on a graph, printing the order nodes are visited.", diff:"Medium"},
+   {t:"Connected components", d:"Recursively count how many connected components exist in an undirected graph.", diff:"Medium"},
+   {t:"Cycle detection", d:"Recursively detect a cycle in a directed graph, using a currently-in-recursion-stack set alongside the visited set.", diff:"Hard"},
+   {t:"Number of islands", d:"Recursively flood-fill a 2D grid of land and water to count the islands.", diff:"Medium"},
+   {t:"Topological sort", d:"Recursively implement a DFS-based topological sort of a directed acyclic graph.", diff:"Hard"},
+   {t:"Clone a graph", d:"Recursively deep-copy a graph with DFS, using a visited map from node to its clone so cycles don't recurse forever.", diff:"Hard", recap:true}
+ ]},
+ {id:9, name:"Recursive dynamic programming", sub:"Same recursive structure as Tier 3 — but now you cache repeated subproblems. Exponential becomes polynomial.", items:[
+   {t:"Fibonacci, memoized", d:"Take exercise 20 and add a cache. Compare the number of calls before and after.", diff:"Easy"},
+   {t:"Climbing stairs, memoized", d:"Take exercise 23 and add memoization. What's the new time complexity?", diff:"Medium"},
+   {t:"Coin change, fewest coins", d:"Recursively find the minimum number of coins needed to make a target amount, memoized.", diff:"Medium"},
+   {t:"Longest common subsequence", d:"Recursively find the length of the longest subsequence common to two strings, memoized.", diff:"Medium"},
+   {t:"0/1 knapsack", d:"Recursively maximize value under a weight limit, choosing to include or exclude each item, memoized.", diff:"Hard"},
+   {t:"Word break", d:"Recursively determine whether a string can be segmented into words from a dictionary, memoized.", diff:"Hard"},
+   {t:"Decode ways", d:"Recursively count the ways to decode a digit string into letters, 1 is A through 26 is Z, memoized.", diff:"Hard"},
+   {t:"Edit distance", d:"Recursively compute the minimum insertions, deletions, and substitutions to turn one string into another, memoized.", diff:"Hard"},
+   {t:"Longest palindromic subsequence", d:"Find the length of the longest subsequence that reads the same forwards and backwards. Try expressing it as the LCS of a string and its reverse.", diff:"Hard", recap:true}
+ ]}
+];
+
+const KEY = "recursion69_done_v1";
+let done = {};
+try{ const raw = localStorage.getItem(KEY); done = raw ? JSON.parse(raw) : {}; }catch(e){ done = {}; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(done)); }catch(e){} }
+function pct(d,t){ return t ? Math.round((d/t)*100) : 0; }
+function idOf(tier,i){ return tier.id+"-"+i; }
+function tierDone(tier){ return tier.items.filter((_,i)=>done[idOf(tier,i)]).length; }
+function totalCount(){ return TIERS.reduce((a,t)=>a+t.items.length,0); }
+function doneCount(){ return Object.values(done).filter(Boolean).length; }
+
+function render(){
+  const tocGrid = document.getElementById("tocGrid");
+  const main = document.getElementById("tiers");
+  tocGrid.innerHTML = "";
+  main.innerHTML = "";
+  let running = 0;
+
+  TIERS.forEach(tier=>{
+    const d = tierDone(tier);
+
+    const a = document.createElement("a");
+    a.href = "#tier-"+tier.id;
+    a.className = "toc-item";
+    a.innerHTML =
+      '<div class="n">'+String(tier.id).padStart(2,"0")+'</div>'+
+      '<div class="name">'+tier.name+'</div>'+
+      '<div class="bar"><span style="width:'+pct(d,tier.items.length)+'%"></span></div>'+
+      '<div class="count">'+d+' / '+tier.items.length+'</div>';
+    tocGrid.appendChild(a);
+
+    const det = document.createElement("details");
+    det.className = "tier";
+    det.id = "tier-"+tier.id;
+    det.open = true;
+
+    const rows = tier.items.map((ex,i)=>{
+      running++;
+      const num = String(running).padStart(2,"0");
+      const key = idOf(tier,i);
+      const isDone = !!done[key];
+      const cid = "ex-"+key;
+      return '<div class="ex'+(isDone?" done":"")+'">'+
+        '<input type="checkbox" id="'+cid+'" data-key="'+key+'" '+(isDone?"checked":"")+'/>'+
+        '<label for="'+cid+'" class="ex-body">'+
+          '<div class="ex-top">'+
+            '<span class="num">'+num+'</span>'+
+            '<span class="title">'+ex.t+'</span>'+
+            (ex.recap?'<span class="tag recap">Recap</span>':'')+
+            '<span class="tag '+ex.diff+'">'+ex.diff+'</span>'+
+          '</div>'+
+          '<p class="desc">'+ex.d+'</p>'+
+        '</label>'+
+      '</div>';
+    }).join("");
+
+    det.innerHTML =
+      '<summary>'+
+        '<span class="tier-num">'+String(tier.id).padStart(2,"0")+'</span>'+
+        '<div class="tier-head">'+
+          '<h2>'+tier.name+'</h2>'+
+          '<p class="sub">'+tier.sub+'</p>'+
+          '<div class="bar"><span style="width:'+pct(d,tier.items.length)+'%"></span></div>'+
+          '<div class="count">'+d+' / '+tier.items.length+' complete</div>'+
+        '</div>'+
+        '<svg class="chev" viewBox="0 0 20 20" fill="none"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      '</summary>'+
+      '<div class="ex-list">'+rows+'</div>';
+
+    main.appendChild(det);
+  });
+
+  main.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener("change", ()=>{
+      done[cb.dataset.key] = cb.checked;
+      save();
+      cb.closest(".ex").classList.toggle("done", cb.checked);
+      refreshCounts();
+    });
+  });
+
+  refreshCounts();
+}
+
+function refreshCounts(){
+  TIERS.forEach(tier=>{
+    const d = tierDone(tier);
+    const det = document.getElementById("tier-"+tier.id);
+    if(det){
+      det.querySelector(".tier-head .bar > span").style.width = pct(d,tier.items.length)+"%";
+      det.querySelector(".tier-head .count").textContent = d+" / "+tier.items.length+" complete";
+    }
+    const tocItem = document.querySelector('.toc-item[href="#tier-'+tier.id+'"]');
+    if(tocItem){
+      tocItem.querySelector(".bar > span").style.width = pct(d,tier.items.length)+"%";
+      tocItem.querySelector(".count").textContent = d+" / "+tier.items.length;
+    }
+  });
+  const dc = doneCount(), tc = totalCount();
+  document.getElementById("topBar").style.width = pct(dc,tc)+"%";
+  document.getElementById("topText").textContent = dc+" / "+tc;
+}
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(confirm("Clear all checked exercises? This can't be undone.")){
+    done = {};
+    save();
+    render();
+    window.scrollTo(0,0);
+  }
+});
+
+render();
+</script>
+</body>
+</html>
